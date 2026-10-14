@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Learning Roadmap
 
-## Getting Started
+A personal learning roadmap and progress tracker. Built with Next.js (App Router), React, TypeScript, Tailwind CSS, and Lucide icons.
 
-First, run the development server:
+All data lives in the browser's `localStorage`. There is no backend, database, or login. Progress is specific to the browser and device it was recorded on.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open the URL printed in the terminal (usually http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/                     Routes (dashboard + one page per roadmap section)
+components/
+  app-shell.tsx          Page frame: desktop sidebar, mobile top bar and drawer
+  sidebar.tsx            Navigation, collapse toggle, overall progress
+  java-roadmap.tsx       /java — the 7-day roadmap, one collapsible section per day
+  coding-questions-list.tsx  /coding-questions — all daily questions with solved status
+  question-detail.tsx    /coding-questions/[slug] — full problem statement
+  empty-state-page.tsx   Placeholder for roadmap sections without content yet
+  dashboard/             Dashboard sections (header, stats, timeline, tasks, daily update)
+  ui/                    Small shared primitives (card, page header, badges, progress bar)
+hooks/                   useLocalStorage, useLearningProgress, useToday
+lib/
+  storage.ts             Versioned localStorage keys and safe JSON parsing
+  content/
+    java-roadmap.ts      What to learn each day (edit topics here)
+    coding-questions.ts  One coding question per day (edit problems here)
+  learning-plan.ts       Combines the two into the 7-day plan and its tasks
+  progress.ts            Derives progress and day statuses from completed tasks
+  navigation.ts          Sidebar items, shared with the section pages
+```
