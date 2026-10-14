@@ -3,13 +3,19 @@
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useSyncState } from "@/hooks/use-sync-state";
 import { cn } from "@/lib/cn";
 import { STORAGE_KEYS } from "@/lib/storage";
+import { startSync } from "@/lib/sync";
 import { Sidebar } from "./sidebar";
+import { UnlockScreen } from "./unlock-screen";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useLocalStorage(STORAGE_KEYS.sidebarCollapsed, false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { status } = useSyncState();
+
+  useEffect(() => startSync(), []);
 
   // Close the mobile drawer with Escape and lock page scroll while it is open.
   useEffect(() => {
@@ -24,6 +30,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       document.body.style.overflow = "";
     };
   }, [drawerOpen]);
+
+  if (status === "locked") return <UnlockScreen />;
 
   return (
     <div className="min-h-screen">

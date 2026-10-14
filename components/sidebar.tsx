@@ -7,6 +7,7 @@ import { PanelLeftClose, PanelLeftOpen, Route, X } from "lucide-react";
 import { useLearningProgress } from "@/hooks/use-learning-progress";
 import { cn } from "@/lib/cn";
 import { NAV_SECTIONS } from "@/lib/navigation";
+import { SyncIndicator } from "./sync-indicator";
 import { ProgressBar } from "./ui/progress-bar";
 
 interface SidebarProps {
@@ -124,8 +125,11 @@ function SidebarProgress({ collapsed }: { collapsed: boolean }) {
 
   if (collapsed) {
     return (
-      <div className="flex justify-center border-t border-zinc-200/80 py-3" title={`Overall progress: ${percent}%`}>
-        <ProgressRing percent={percent} />
+      <div className="flex flex-col items-center gap-2 border-t border-zinc-200/80 py-3">
+        <span title={`Overall progress: ${percent}%`}>
+          <ProgressRing percent={percent} />
+        </span>
+        <SyncIndicator compact />
       </div>
     );
   }
@@ -140,6 +144,9 @@ function SidebarProgress({ collapsed }: { collapsed: boolean }) {
       <p className="mt-2 text-[11px] text-zinc-500 tabular-nums">
         {completedTasks} of {totalTasks} tasks completed
       </p>
+      <div className="mt-2.5 border-t border-zinc-200/80 pt-2.5">
+        <SyncIndicator />
+      </div>
     </div>
   );
 }

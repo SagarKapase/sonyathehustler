@@ -2,7 +2,16 @@
 
 A personal learning roadmap and progress tracker. Built with Next.js (App Router), React, TypeScript, Tailwind CSS, and Lucide icons.
 
-All data lives in the browser's `localStorage`. There is no backend, database, or login. Progress is specific to the browser and device it was recorded on.
+Progress is saved in the browser's `localStorage` and, when configured, synced through a Neon Postgres database so a learner and a mentor see the same progress on different devices.
+
+## Sync setup
+
+Copy `.env.example` to `.env.local` and set:
+
+- `DATABASE_URL`: Neon connection string. The `learning_progress` table is created automatically.
+- `APP_PASSCODE`: shared passcode. Each browser enters it once; changing it signs everyone out.
+
+If either is missing, the app runs in local-only mode. Set the same two variables in your hosting provider (e.g. Vercel → Project → Settings → Environment Variables) when deploying.
 
 ## Getting started
 

@@ -4,8 +4,8 @@
  * Every key is stored as `learning-roadmap:v<VERSION>:<name>`. Bump VERSION
  * when a stored shape changes incompatibly; old entries are simply ignored.
  *
- * Note: localStorage is specific to one browser on one device. Nothing here
- * syncs between devices.
+ * localStorage is the source of truth for the UI. Keys listed in SYNCED_KEYS
+ * are also mirrored to the server by lib/sync.ts when sync is configured.
  */
 
 const NAMESPACE = "learning-roadmap";
@@ -18,9 +18,14 @@ export const STORAGE_KEYS = {
   dailyUpdates: "daily-updates",
   /** Whether the desktop sidebar is collapsed. */
   sidebarCollapsed: "sidebar-collapsed",
+  /** Synced keys with local changes the server hasn't confirmed yet. */
+  syncPending: "sync-pending",
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
+
+/** Keys shared between devices through the server. Device preferences stay local. */
+export const SYNCED_KEYS = [STORAGE_KEYS.tasks, STORAGE_KEYS.dailyUpdates] as const;
 
 function fullKey(key: StorageKey) {
   return `${NAMESPACE}:v${VERSION}:${key}`;
@@ -56,14 +61,28 @@ export function readRaw(key: StorageKey): string | null {
 }
 
 const listeners = new Set<() => void>();
+const localWriteListeners = new Set<(key: StorageKey) => void>();
 
-export function writeValue<T>(key: StorageKey, value: T) {
+/**
+ * Stores `value` and notifies subscribers. Writes that came from the server
+ * pass `fromRemote` so they aren't sent back to it.
+ */
+export function writeValue<T>(key: StorageKey, value: T, { fromRemote = false } = {}) {
   try {
     window.localStorage.setItem(fullKey(key), JSON.stringify(value));
   } catch {
     // Storage can be full or disabled (e.g. private mode); keep the UI usable.
   }
   listeners.forEach((listener) => listener());
+  if (!fromRemote) localWriteListeners.forEach((listener) => listener(key));
+}
+
+/** Called for every write made by this tab's UI (not for remote updates). */
+export function onLocalWrite(listener: (key: StorageKey) => void) {
+  localWriteListeners.add(listener);
+  return () => {
+    localWriteListeners.delete(listener);
+  };
 }
 
 /** Subscribes to writes from this tab and from other tabs of the same browser. */
